@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: post-deploy-notification
+  namespace: my-app
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  ttlSecondsAfterFinished: 60
+  template:
+    spec:
+      containers:
+        - name: notify
+          image: curlimages/curl
+          command:
+            - curl
+            - -X POST
+            - https://hooks.slack.com/services/xxx
+            - -d
+            - '{"text":"✅ Deployment completed successfully!"}'
+      restartPolicy: Never

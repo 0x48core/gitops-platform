@@ -1,0 +1,14 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: complex-deploy-task
+  annotations:
+    argocd.argoproj.io/hook: Sync
+spec:
+  template:
+    spec:
+      containers:
+        - name: deploy-helper
+          image: my-app:latest
+          command: ["./complex-setup.sh"]
+      restartPolicy: Never

@@ -1,0 +1,14 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-schema-migration
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+spec:
+  template:
+    spec:
+      containers:
+        - name: migration
+          image: my-app:latest
+          command: ["python", "manage.py", "migrate"]
+      restartPolicy: Never
