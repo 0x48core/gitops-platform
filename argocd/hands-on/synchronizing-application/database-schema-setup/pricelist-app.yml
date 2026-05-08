@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: pricelist-app
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    path: ch05/manifests/
+    repoURL: https://github.com/sabre1041/argocd-up-and-running-book
+    targetRevision: main
+    kustomize:
+      images:
+        - mysql:5.6.51=mysql:8.0
+      patches:
+        - target:
+            kind: Deployment
+            name: mysql
+          patch: |-
+            - op: replace
+              path: /spec/template/spec/containers/0/volumeMounts/0/mountPath
+              value: /var/lib/mysql
+  destination:
+    namespace: pricelist
+    name: in-cluster
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
